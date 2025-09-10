@@ -1,13 +1,24 @@
 import { PrismaClient } from '../src/database/generated/prisma'
+import { PasswordService } from '../src/services/password.service'
 
 const prisma = new PrismaClient()
+const passwordService = new PasswordService()
 
 async function main() {
-  console.log('Seeding database...')
+  const salt = passwordService.generateSalt()
+  const hashedPassword = await passwordService.hashPassword('123456', salt)
 
-  // -------------------------
-  // 1. Priority
-  // -------------------------
+  const admin = await prisma.user.upsert({
+    where: { username: 'admin' },
+    update: {},
+    create: {
+      username: 'admin',
+      nickname: 'admin',
+      salt,
+      password: hashedPassword,
+    },
+  })
+
   const priorities = [
     { weight: 3, name: 'High', highlight_color: '#FF4D4F' },
     { weight: 2, name: 'Medium', highlight_color: '#FAAD14' },
@@ -16,57 +27,17 @@ async function main() {
 
   for (const p of priorities) {
     await prisma.priority.upsert({
-      where: { name: p.name },
+      where: { user_id_name: { user_id: admin.id, name: p.name } },
       update: {},
-      create: p,
+      create: { ...p, user_id: admin.id },
     })
   }
 
-  // -------------------------
-  // 2. Dictionary (全局选项)
-  // -------------------------
-  const dictionaries = [
-    { key: 'theme', code: 'LIGHT', value: '浅色', sort: 1 },
-    { key: 'theme', code: 'DARK', value: '深色', sort: 2 },
-    { key: 'priority_level', code: 'HIGH', value: '高', sort: 1 },
-    { key: 'priority_level', code: 'MED', value: '中', sort: 2 },
-    { key: 'priority_level', code: 'LOW', value: '低', sort: 3 },
-  ]
-
-  for (const d of dictionaries) {
-    await prisma.dictionary.upsert({
-      where: { key_code: { key: d.key, code: d.code } },
-      update: {},
-      create: d,
-    })
-  }
-
-  // -------------------------
-  // 3. User
-  // -------------------------
-  await prisma.user.upsert({
-    where: { username: 'admin' },
-    update: {},
-    create: {
-      username: 'admin',
-      password: '123456', // 注意：实际生产请 hash
-      preferences: {
-        create: [
-          { key: 'default_priority', value: 'MED' },
-          { key: 'default_theme', value: 'LIGHT' },
-        ],
-      },
-    },
-  })
-
-  console.log('Seeding finished.')
+  console.log('Seed finished.')
 }
 
 main()
-  .catch((e) => {
-    console.error(e)
-    process.exit(1)
-  })
+  .catch(console.error)
   .finally(async () => {
     await prisma.$disconnect()
   })

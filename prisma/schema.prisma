@@ -22,11 +22,17 @@ datasource db {
 
 model User {
   id          String       @id @default(uuid()) @db.Uuid
-  username    String
+  username    String       @unique
+  nickname    String?
   password    String
+  salt        String
+  avatar      String?
   preferences Preference[]
-  create_at   DateTime     @default(now())
-  update_at   DateTime     @updatedAt
+  is_locked   Boolean      @default(false)
+  is_deleted  Boolean      @default(false)
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+  Priority    Priority[]
 
   @@map("users")
 }
@@ -43,42 +49,46 @@ model Todo {
   plans        PlanTodo[]
   priority     Priority   @relation(fields: [priority_id], references: [id])
   priority_id  String     @db.Uuid
-  create_at    DateTime   @default(now())
-  update_at    DateTime   @updatedAt
+  is_deleted   Boolean    @default(false)
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @updatedAt
 
   @@map("todos")
 }
 
 model Priority {
   id              String   @id @default(uuid()) @db.Uuid
+  user            User     @relation(fields: [user_id], references: [id])
+  user_id         String   @db.Uuid
   weight          Int
   name            String
   highlight_color String
   todos           Todo[]
-  create_at       DateTime @default(now())
-  update_at       DateTime @updatedAt
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
 
-  @@map("prioritys")
+  @@unique([user_id, name])
+  @@map("priorities")
 }
 
 model Tag {
-  id        String   @id @default(uuid()) @db.Uuid
-  name      String
-  todo      Todo     @relation(fields: [todo_id], references: [id])
-  todo_id   String   @db.Uuid
-  create_at DateTime @default(now())
-  update_at DateTime @updatedAt
+  id         String   @id @default(uuid()) @db.Uuid
+  name       String
+  todo       Todo     @relation(fields: [todo_id], references: [id])
+  todo_id    String   @db.Uuid
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@map("tags")
 }
 
 model Note {
-  id        String   @id @default(uuid()) @db.Uuid
-  content   String
-  todo      Todo     @relation(fields: [todo_id], references: [id])
-  todo_id   String   @db.Uuid
-  create_at DateTime @default(now())
-  update_at DateTime @updatedAt
+  id         String   @id @default(uuid()) @db.Uuid
+  content    String
+  todo       Todo     @relation(fields: [todo_id], references: [id])
+  todo_id    String   @db.Uuid
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@map("notes")
 }
@@ -94,8 +104,9 @@ model Plan {
   end_date        DateTime?
   next_occurrence DateTime?
   plan_todos      PlanTodo[]
-  create_at       DateTime   @default(now())
-  update_at       DateTime   @updatedAt
+  created_at      DateTime   @default(now())
+  updated_at      DateTime   @updatedAt
+  is_deleted      Boolean    @default(false)
 
   @@map("plans")
 }
@@ -107,49 +118,50 @@ model PlanTodo {
   todo        Todo     @relation(fields: [todo_id], references: [id])
   todo_id     String   @db.Uuid
   order_index Int      @default(0)
-  create_at   DateTime @default(now())
-  update_at   DateTime @updatedAt
+  is_deleted  Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   @@unique([plan_id, todo_id])
   @@map("plan_todos")
 }
 
 model File {
-  id        String   @id @default(uuid()) @db.Uuid
-  name      String
-  url       String
-  type      String?
-  size      Int
-  todo      Todo     @relation(fields: [todo_id], references: [id])
-  todo_id   String   @db.Uuid
-  create_at DateTime @default(now())
-  update_at DateTime @updatedAt
+  id         String   @id @default(uuid()) @db.Uuid
+  name       String
+  url        String
+  type       String?
+  size       Int
+  todo       Todo     @relation(fields: [todo_id], references: [id])
+  todo_id    String   @db.Uuid
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@map("files")
 }
 
 model Preference {
-  id        String   @id @default(uuid()) @db.Uuid
-  key       String
-  value     String
-  user      User     @relation(fields: [user_id], references: [id])
-  user_id   String   @db.Uuid
-  create_at DateTime @default(now())
-  update_at DateTime @updatedAt
+  id         String   @id @default(uuid()) @db.Uuid
+  key        String
+  value      String
+  user       User     @relation(fields: [user_id], references: [id])
+  user_id    String   @db.Uuid
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@unique([user_id, key])
   @@map("preferences")
 }
 
 model Dictionary {
-  id        String   @id @default(uuid()) @db.Uuid
-  key       String
-  code      String
-  value     String
-  sort      Int      @default(0)
-  is_active Boolean  @default(true)
-  create_at DateTime @default(now())
-  update_at DateTime @updatedAt
+  id         String   @id @default(uuid()) @db.Uuid
+  key        String
+  code       String
+  value      String
+  sort       Int      @default(0)
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@index([key, code])
   @@map("dictionary")
