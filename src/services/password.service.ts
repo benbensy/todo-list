@@ -13,12 +13,7 @@ export class PasswordService {
     return bcrypt.hash(password, salt)
   }
 
-  async validatePassword(
-    password: string,
-    salt: string,
-    hash: string
-  ): Promise<boolean> {
-    const hashed = await this.hashPassword(password, salt)
-    return hashed === hash
+  async validatePassword(password: string, hash: string): Promise<boolean> {
+    return bcrypt.compare(password, hash)
   }
 }

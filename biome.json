@@ -29,6 +29,9 @@
       "quoteStyle": "single",
       "trailingCommas": "es5",
       "semicolons": "asNeeded"
+    },
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
     }
   },
   "assist": {

@@ -25,7 +25,6 @@ model User {
   username    String       @unique
   nickname    String?
   password    String
-  salt        String
   avatar      String?
   preferences Preference[]
   is_locked   Boolean      @default(false)

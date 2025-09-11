@@ -6,7 +6,7 @@ const passwordService = new PasswordService()
 
 async function main() {
   const salt = passwordService.generateSalt()
-  const hashedPassword = await passwordService.hashPassword('123456', salt)
+  const hashedPassword = await passwordService.hashPassword('admin', salt)
 
   const admin = await prisma.user.upsert({
     where: { username: 'admin' },
@@ -14,7 +14,6 @@ async function main() {
     create: {
       username: 'admin',
       nickname: 'admin',
-      salt,
       password: hashedPassword,
     },
   })
