@@ -16,9 +16,9 @@ export default class ProfileController {
   }
 
   @Patch('avatar')
-  async updateAvatar(@Req() req, @Body() userPayload: Prisma.UserUpdateInput) {
+  async updateAvatar(@Req() req, @Body() body: Prisma.UserUpdateInput) {
     const result = await this.usersService.updateAvatar({
-      ...userPayload,
+      ...body,
       id: req.user.id,
     })
 
@@ -28,12 +28,9 @@ export default class ProfileController {
   }
 
   @Patch('nickname')
-  async updateNickname(
-    @Req() req,
-    @Body() userPayload: Prisma.UserUpdateInput
-  ) {
+  async updateNickname(@Req() req, @Body() body: Prisma.UserUpdateInput) {
     const result = await this.usersService.updateAvatar({
-      ...userPayload,
+      ...body,
       id: req.user.id,
     })
 

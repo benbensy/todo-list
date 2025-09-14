@@ -32,6 +32,7 @@ model User {
   created_at  DateTime     @default(now())
   updated_at  DateTime     @updatedAt
   priorities  Priority[]
+  Todo        Todo[]
 
   @@map("users")
 }
@@ -42,12 +43,14 @@ model Todo {
   content      String?
   is_completed Boolean    @default(false)
   deadline     DateTime?
+  user         User       @relation(fields: [user_id], references: [id])
+  user_id      String     @db.Uuid
   attachments  File[]
   tags         Tag[]
   notes        Note[]
   plans        PlanTodo[]
-  priority     Priority   @relation(fields: [priority_id], references: [id])
-  priority_id  String     @db.Uuid
+  priority     Priority?  @relation(fields: [priority_id], references: [id])
+  priority_id  String?    @db.Uuid
   is_deleted   Boolean    @default(false)
   created_at   DateTime   @default(now())
   updated_at   DateTime   @updatedAt

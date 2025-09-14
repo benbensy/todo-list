@@ -16,6 +16,7 @@
     "debug": "nest start --debug --watch",
     "dev": "nest start --watch",
     "lint": "biome check --write --no-errors-on-unmatched",
+    "lint:check": "biome check",
     "prepare:client": "pnpm run db:generate-client",
     "start": "pm2 start dist/main.js --name todo-list",
     "stop": "pm2 stop todo-list",

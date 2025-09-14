@@ -9,6 +9,7 @@ import AuthModule from './modules/auth.module'
 import { CacheModule } from './modules/cache.module'
 import PrismaModule from './modules/prisma.module'
 import ProfileModule from './modules/profile.module'
+import TodosModule from './modules/todos.module'
 import UsersModule from './modules/users.module'
 
 @Module({
@@ -21,6 +22,7 @@ import UsersModule from './modules/users.module'
     AuthModule,
     UsersModule,
     ProfileModule,
+    TodosModule,
   ],
   controllers: [AppController, AuthController],
   providers: [

@@ -1,6 +1,6 @@
 import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common'
 import { Prisma } from 'src/database/generated/prisma'
-import { Public } from 'src/decorators/is-public.decorator'
+import { Public } from 'src/decorators/public.decorator'
 import { LocalAuthGuard } from 'src/guards/local-auth.guard'
 import AuthService from 'src/services/auth.service'
 
@@ -22,7 +22,7 @@ export default class AuthController {
 
   @Public()
   @Post('signup')
-  async signup(@Body() userPayload: Prisma.UserCreateInput) {
-    return this.authService.signup(userPayload)
+  async signup(@Body() body: Prisma.UserCreateInput) {
+    return this.authService.signup(body)
   }
 }
