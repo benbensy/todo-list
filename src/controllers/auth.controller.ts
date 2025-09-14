@@ -1,11 +1,28 @@
-import { Controller, Post, Request, UseGuards } from '@nestjs/common'
-import { AuthGuard } from '@nestjs/passport'
+import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common'
+import { Prisma } from 'src/database/generated/prisma'
+import { Public } from 'src/decorators/is-public.decorator'
+import { LocalAuthGuard } from 'src/guards/local-auth.guard'
+import AuthService from 'src/services/auth.service'
 
 @Controller('/auth')
 export default class AuthController {
-  @UseGuards(AuthGuard('local'))
+  constructor(private readonly authService: AuthService) {}
+
+  @Public()
+  @UseGuards(LocalAuthGuard)
   @Post('signin')
-  async login(@Request() req) {
-    return req.user
+  async signin(@Request() req) {
+    return this.authService.signin(req.user)
+  }
+
+  @Post('signout')
+  async signout(@Request() req) {
+    return req
+  }
+
+  @Public()
+  @Post('signup')
+  async signup(@Body() userPayload: Prisma.UserCreateInput) {
+    return this.authService.signup(userPayload)
   }
 }
